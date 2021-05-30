@@ -5,7 +5,10 @@
     <body>
         <h1>Server Info.</h1>
         <ol>
-            <li>Name : {{name}}</li>
+            {% for key in info.keys() %}
+            <li>{{ key }} : {{ info[key] }}</li>
+            {% endfor %}
         </ol>
+        {{ content }}
     </body>
 </html>

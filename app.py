@@ -1,23 +1,26 @@
 from flask import Flask, render_template, request
+from flask_cors import CORS
 
-from bert_chat.router import chat_router
+from mask_detector.router import mask_router
 
 app = Flask(__name__)
-app.register_blueprint(chat_router, url_prefix="/chat")
+CORS(app, resources={ '*': {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': '*',
+}})
+app.register_blueprint(mask_router, url_prefix='/mask-detector')
 
 
-@app.route("/")
-def render_info_page():
-    return render_template("index.html", name=__name__)
+@app.route('/')
+def router_main():
+    return render_template('index.html', 
+        info={
+            'Name': __name__,
+            'Methods': ['GET']
+        }
+    )
 
 
-@app.route("/translation/kren", methods=("GET", "POST", "PUT", "DELETE"))
-def route_ke_translation():
-    if request.method == "GET":
-        return str(request.method)
-    else:
-        return str(request.method)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
