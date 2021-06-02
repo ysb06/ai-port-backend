@@ -5,11 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run project",
+            "name": "Run Flask app",
             "type": "python",
             "request": "launch",
             "program": "app.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Run Mask-detector Trainer",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--target", "mask_detector"
+            ]
         },
         {
             "name": "Python: Current File",

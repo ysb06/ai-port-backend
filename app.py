@@ -1,14 +1,8 @@
-from flask import Flask, render_template, request
-from flask_cors import CORS
+from flask import Flask, render_template
 
 from mask_detector.router import mask_router
 
 app = Flask(__name__)
-CORS(app, resources={ '*': {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': '*',
-    'Access-Control-Allow-Methods': '*',
-}})
 app.register_blueprint(mask_router, url_prefix='/mask-detector')
 
 
@@ -20,7 +14,6 @@ def router_main():
             'Methods': ['GET']
         }
     )
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
