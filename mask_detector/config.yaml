@@ -15,23 +15,31 @@ save_paths:
 hyperparameters:
   seed: 327459
   epochs: 20
-  clip_grad: 10
-  patience: 5   # 수정
 
   dataloader:
+    target_fold: -1   # -1인 경우 all
     args:
       seed: 327459
-      n_splits: 5
-      image_width: 384
-      image_height: 384
+      kfold_n_splits: 5
+      image_side_length: 384
+      cross_validation: False
+      train_loader_args:
+        batch_size: 64
+      valid_loader_args:
+        batch_size: 64
 
   model:
-    name: LSTMATTN
+    name: Efficientnet
     args:
-      hidden_dim: 64
-      n_layers: 2
-      n_heads: 2
-      drop_out: 0.2
+      num_classes: 3
+      pretrained_model_name: efficientnet-b5
+      backbone_freeze: True
+  loss:
+    name: FocalLoss
+    args:
+      weight: null
+      gamma: 2
+      reduction: mean
 
   optimizer:
     name: AdamW
@@ -40,12 +48,10 @@ hyperparameters:
       weight_decay: 0.01
 
   scheduler:
-    name: ReduceLROnPlateau
+    name: CosineAnnealingLR
     args:
-      patience: 5   # 수정
-      factor: 0.5
-      mode: max
-      verbose: True
+      T_max: 50
+      eta_min: 0
 
 trainee_name: MaskEff
 trainee_type: MaskModelTrainee

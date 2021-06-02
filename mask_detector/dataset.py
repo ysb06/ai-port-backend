@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from glob import glob
 from random import Random
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 import logging
 
 import cv2 as cv
@@ -46,35 +46,37 @@ class MaskedFaceDataset(Dataset):
         self.transform: A.Compose = None
 
     def __len__(self) -> int:
-        return len(self.serve_list)
+        return len(self.data)
     
     def __getitem__(self, index) -> Tuple:
         target: MaskImage = self.data[index]
 
         source = self.transform(image=target.image_raw)["image"]
-        label = int(target.mask_state)
+        label = target.mask_state.value
 
         return source, label
 
 
-def get_dataset_folds(      # 다른 모델을 생성할 경우 dataset타입을 인수로 받는 거도 고려
+def get_dataloader_folds(      # 다른 모델을 생성할 경우 dataset타입을 인수로 받는 거도 고려
         data_root_path: str,
-        label_file_name: str,
+        label_file_path: str,
+        kfold_n_splits: int,
+        image_side_length: int,
+        cross_validation: bool,
+        train_loader_args: Dict,
+        valid_loader_args: Dict,
         seed: int = None,
-        n_splits: int = 5,
-        image_width: int = 256,
-        image_height: int = 256,
-    ) -> List[Tuple[MaskedFaceDataset, MaskedFaceDataset]]:
-    mask_label_path = os.path.join(data_root_path, label_file_name)
+    ) -> List[Tuple[DataLoader, DataLoader]]:
+    mask_label_path = label_file_path
     label_raw = pd.read_csv(mask_label_path)
     age_group = np.where(label_raw['age'] < 40, 'young', 'old')
     label_raw['group'] = label_raw['gender'].str.cat(age_group, sep='_')
     
-    dataset_folds = []
-    train_transform = __get_basic_train_transforms((image_width, image_height))
-    valid_transform = __get_valid_transforms((image_width, image_height))
+    dataloader_folds = []
+    train_transform = __get_basic_train_transforms(image_side_length)
+    valid_transform = __get_valid_transforms(image_side_length)
 
-    skf = StratifiedKFold(n_splits=n_splits, shuffle=seed != None, random_state=seed)
+    skf = StratifiedKFold(n_splits=kfold_n_splits, shuffle=seed != None, random_state=seed)
     for index, (train_idx, valid_idx) in enumerate(skf.split(X=label_raw, y=label_raw['group'])):
         logger.info(f'Generating dataset fold {index}...')
         train_data, valid_data = label_raw.iloc[train_idx], label_raw.iloc[valid_idx]
@@ -87,10 +89,16 @@ def get_dataset_folds(      # 다른 모델을 생성할 경우 dataset타입을
         # 데이터셋 생성
         # Transform을 각 데이터셋에 맞게 적용
 
-        dataset_group = (train_dataset, valid_dataset)
-        dataset_folds.append(dataset_group)
+        dataset_group = (
+            DataLoader(train_dataset, **train_loader_args),
+            DataLoader(valid_dataset, **valid_loader_args),
+        )
+        dataloader_folds.append(dataset_group)
 
-    return dataset_folds
+        if cross_validation is not True:
+            break
+
+    return dataloader_folds
 
 def __generate_dataset(raw: DataFrame, root_path: str, seed: int):  
     data: List[MaskImage] = []
@@ -133,18 +141,15 @@ def __generate_dataset(raw: DataFrame, root_path: str, seed: int):
 
 
 def __get_basic_train_transforms(
-        image_size: Tuple[int, int], 
+        image_side_length: int, 
         mean: Tuple[float, float, float] = (0.485, 0.456, 0.406), 
         std: Tuple[float, float, float] = (0.229, 0.224, 0.225)
     ):  
     # https://github.com/lukemelas/EfficientNet-PyTorch
     # Mean, Std는 위 링크를 참조했으며 Efficientnet Pretrained Model의 설정 값으로 추정
-    min_length = min(image_size[0], image_size[1])
-
     train_transforms = A.Compose([
-        SmallestMaxSize(max_size=min_length, always_apply=True),
-        A.CenterCrop(min_length, min_length, always_apply=True),
-        A.Resize(image_size[0], image_size[1], p=1.0),
+        SmallestMaxSize(max_size=image_side_length, always_apply=True),
+        A.CenterCrop(image_side_length, image_side_length, always_apply=True),
         A.HorizontalFlip(p=0.5),
         A.ShiftScaleRotate(p=0.5, rotate_limit=15),
         A.HueSaturationValue(hue_shift_limit=0.2,
@@ -164,16 +169,13 @@ def __get_basic_train_transforms(
 
 
 def __get_valid_transforms(
-        image_size: Tuple[int, int], 
+        image_side_length: int,
         mean: Tuple[float, float, float] = (0.548, 0.504, 0.479), 
         std: Tuple[float, float, float] = (0.237, 0.247, 0.246)
     ):
-    min_length = min(image_size[0], image_size[1])
-
     val_transforms = A.Compose([
-        SmallestMaxSize(max_size=min_length, always_apply=True),
-        A.CenterCrop(min_length, min_length, always_apply=True),
-        A.Resize(image_size[0], image_size[1], p=1.0),
+        SmallestMaxSize(max_size=image_side_length, always_apply=True),
+        A.CenterCrop(image_side_length, image_side_length, always_apply=True),
         A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
         ToTensorV2(p=1.0),
     ])
