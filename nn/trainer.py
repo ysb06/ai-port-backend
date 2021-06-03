@@ -1,26 +1,19 @@
 import logging
 from mask_detector.loss import FocalLoss
 import os
-import random
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Dict
 from mask_detector.model import EfficientBase
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torch.nn as nn
 from mask_detector.dataset import get_dataloader_folds
 from pytz import timezone
 from torch import Tensor
 from torch.optim import AdamW, Optimizer
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import DataLoader
-from torch import optim
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from sklearn.metrics import f1_score
 
 from nn.utils import seed_everything
 
@@ -125,7 +118,7 @@ class TraineeBase:
 
 class MaskModelTrainee(TraineeBase):
     def on_train_begin(self):
-        self.logging_inteval = 100
+        self.logging_inteval = 10
 
         self.dataloader_folds = get_dataloader_folds(
             data_root_path=self.paths.train_data_root,
@@ -136,8 +129,8 @@ class MaskModelTrainee(TraineeBase):
         self.model = EfficientBase(**self.hyperparameters['model']['args'])
         self.model.to(self.device)
         self.criterion = FocalLoss(**self.hyperparameters['loss']['args'])
-        self.optimizer = optim.AdamW(self.model.parameters(), **self.hyperparameters['optimizer']['args'])
-        self.scheduler = optim.lr_scheduler.CosineAnnealingLR(self.optimizer, **self.hyperparameters['scheduler']['args'])
+        self.optimizer = AdamW(self.model.parameters(), **self.hyperparameters['optimizer']['args'])
+        self.scheduler = CosineAnnealingLR(self.optimizer, **self.hyperparameters['scheduler']['args'])
     
     def on_train(self):
         for fold, loaders in enumerate(self.dataloader_folds):
@@ -180,7 +173,7 @@ class MaskModelTrainee(TraineeBase):
                     # Examination
                     loss_value += loss.item()
                     tp_matches += (predicts == label_batch).sum().item()
-                    if (step + 1) % 100 == 0:
+                    if (step + 1) % self.logging_inteval == 0:
                         # Calc
                         train_loss = loss_value / self.logging_inteval
                         train_accuracy = tp_matches / (train_loader.batch_size * self.logging_inteval)
@@ -242,7 +235,7 @@ class MaskModelTrainee(TraineeBase):
                     torch.save(self.model.state_dict(), f"{self.paths.checkpoint}/last.pth")
                     self.tensorboard.add_scalar("Val/loss", valid_loss, current_epoch)
                     self.tensorboard.add_scalar("Val/accuracy", valid_accuracy, current_epoch)
-                    logger.info(f'Epoch {current_epoch} end.')
+                    logger.info(f'Epoch {current_epoch + 1} end.')
 
         # Training End
 

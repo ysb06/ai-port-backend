@@ -28,21 +28,6 @@ def load_config(config_file_name: str, config_file_folder: str='./'):
     return training_config
 
 
-def initialize_folders(save_paths: Dict[str, str]):
-    root_path = save_paths["root_dir"]
-    if not os.path.isdir(root_path):
-        os.mkdir(root_path)
-        logger.info(f"{root_path} created")
-
-    for key in save_paths:
-        if key != "root_dir":
-            target_path = os.path.join(root_path, save_paths[key])
-
-            if not os.path.isdir(target_path):
-                os.mkdir(target_path)
-                logger.info(f"{target_path} created")
-
-
 if __name__ == "__main__":
     print()
     parser = argparse.ArgumentParser()
@@ -63,9 +48,6 @@ if __name__ == "__main__":
     # Load config file
     config = load_config(option_args.config_file, config_file_folder=option_args.target)
     config["device"] = target_device
-
-    # 필요한 폴더 생성
-    initialize_folders(config["save_paths"])
     
     # Training Code
     trainee_class: Type[TraineeBase] = getattr(nn.trainer, config["trainee_type"])
