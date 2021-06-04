@@ -1,22 +1,21 @@
+import logging
 import os
 from dataclasses import dataclass
 from enum import Enum
 from glob import glob
 from random import Random
 from typing import Any, Dict, List, Tuple
-import logging
 
+import albumentations as A
 import cv2 as cv
 import numpy as np
 import pandas as pd
-from pandas import Series
+from albumentations.augmentations import SmallestMaxSize
+from albumentations.pytorch import ToTensorV2
 from pandas.core.frame import DataFrame
 from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-from albumentations.augmentations import SmallestMaxSize
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
