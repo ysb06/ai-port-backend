@@ -73,8 +73,8 @@ def get_dataloader_folds(      # 다른 모델을 생성할 경우 dataset타입
     label_raw['group'] = label_raw['gender'].str.cat(age_group, sep='_')
     
     dataloader_folds = []
-    train_transform = __get_basic_train_transforms(image_side_length)
-    valid_transform = __get_valid_transforms(image_side_length)
+    train_transform = _get_basic_train_transforms(image_side_length)
+    valid_transform = get_valid_transforms(image_side_length)
 
     skf = StratifiedKFold(n_splits=kfold_n_splits, shuffle=seed != None, random_state=seed)
     for index, (train_idx, valid_idx) in enumerate(skf.split(X=label_raw, y=label_raw['group'])):
@@ -140,7 +140,7 @@ def __generate_dataset(raw: DataFrame, root_path: str, seed: int):
     return MaskedFaceDataset(data)
 
 
-def __get_basic_train_transforms(
+def _get_basic_train_transforms(
         image_side_length: int, 
         mean: Tuple[float, float, float] = (0.485, 0.456, 0.406), 
         std: Tuple[float, float, float] = (0.229, 0.224, 0.225)
@@ -168,7 +168,7 @@ def __get_basic_train_transforms(
     return train_transforms
 
 
-def __get_valid_transforms(
+def get_valid_transforms(
         image_side_length: int,
         mean: Tuple[float, float, float] = (0.548, 0.504, 0.479), 
         std: Tuple[float, float, float] = (0.237, 0.247, 0.246)
@@ -181,3 +181,5 @@ def __get_valid_transforms(
     ])
 
     return val_transforms
+
+# 다른 크기의 사진은 잘 추론 못할 수 있다??
