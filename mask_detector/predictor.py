@@ -11,7 +11,7 @@ model = None
 def model_initialize():
     global model
     model = EfficientBase(num_classes=3, pretrained_model_name='efficientnet-b5')
-    model.load_state_dict(torch.load(f"./assets/results/checkpoint/MaskEff/best.pth"))
+    model.load_state_dict(torch.load(f"./assets/results/checkpoint/MaskEff/best.pth", map_location=torch.device('cpu')))
     
 
 def predict(target_raw: FileStorage):
