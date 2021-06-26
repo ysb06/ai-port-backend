@@ -14,7 +14,7 @@ save_paths:
 
 hyperparameters:
   seed: 327459
-  epochs: 20
+  epochs: 40
 
   dataloader:
     target_fold: -1   # -1인 경우 all

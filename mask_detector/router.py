@@ -23,5 +23,5 @@ def router_main():
         # GCP f1-micro 서버로는 RAM이 부족해서 다른 모델을 사용하려면 OOM이 발생할 것으로 예측되므로
         # 현재는 요청과 함께 모델을 하드디스크로부터 불러오고 사용 완료되면 메모리에서 삭제하는 식으로 동작
 
-        print(f"Predict Complete: {result}")
+        # print(f"Predict Complete: {result}")
         return jsonify({'result': result})
