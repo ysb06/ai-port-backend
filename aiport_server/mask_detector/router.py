@@ -1,6 +1,6 @@
+from aiport_server.mask_detector.predictor import (model_finalize,
+                                                   model_initialize, predict)
 from flask import Blueprint, jsonify, render_template, request
-
-from mask_detector.predictor import model_finalize, model_initialize, predict
 
 mask_router = Blueprint('mask-detector', __name__)
 

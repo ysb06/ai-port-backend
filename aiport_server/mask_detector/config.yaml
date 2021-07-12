@@ -1,13 +1,13 @@
 # Mask Detection Model Config
 
 data_paths:
-  train_root_dir: .\assets\data\mask\train\
-  test_root_dir: .\assets\data\mask\eval\
+  train_root_dir: ..\assets\data\mask\train\
+  test_root_dir: ..\assets\data\mask\eval\
   training_data_file: train.csv
   test_data_file: test_data.csv
 
 save_paths:
-  root_dir: ./assets/results/
+  root_dir: ../assets/results/
   checkpoints_dir: checkpoint/
   tensorboard_dir: tensorboard/
   yaml_dir: yaml_log/

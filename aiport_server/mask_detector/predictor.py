@@ -1,10 +1,9 @@
 import cv2 as cv
 import numpy as np
 import torch
+from aiport_server.mask_detector.dataset import get_valid_transforms
+from aiport_server.mask_detector.model import EfficientBase
 from werkzeug.datastructures import FileStorage
-
-from mask_detector.dataset import get_valid_transforms
-from mask_detector.model import EfficientBase
 
 model = None
 

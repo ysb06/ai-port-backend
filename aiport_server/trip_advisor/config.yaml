@@ -1,0 +1,33 @@
+# Trip Advisor DST Model Config
+trainee_name: TripDST
+trainee_type: DSTTrainee
+
+data_paths:
+  train_root_dir: .\assets\data\trip\wos-v1\
+  test_root_dir: .\assets\data\trip\wos-v1\
+  training_data_file: wos-v1_train.json
+  test_data_file: wos-v1_dev.json
+
+save_paths:
+  root_dir: ../assets/results/
+  checkpoints_dir: checkpoint/
+  tensorboard_dir: tensorboard/
+  yaml_dir: yaml_log/
+
+hyperparameters:
+  seed: 327459
+  epochs: 40
+  dataloader:
+    args: null
+  model:
+    name: Efficientnet
+    args: null
+  loss:
+    name: Efficientnet
+    args: null
+  optimizer:
+    name: Efficientnet
+    args: null
+  scheduler:
+    name: Efficientnet
+    args: null

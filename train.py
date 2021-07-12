@@ -1,13 +1,13 @@
 import argparse
 import logging
 import os
-from typing import Dict, Type
+from typing import Type
+import importlib
 
 import torch
 import yaml
+from aiport_server.trainee import TraineeBase
 
-import nn.trainer
-from nn.trainer import TraineeBase
 
 logging.basicConfig(
     format='%(asctime)s %(name)s [%(levelname)s] %(message)s',
@@ -19,11 +19,11 @@ logger = logging.getLogger(__name__)
 
 
 def load_config(config_file_name: str, config_file_folder: str='./'):
-    path = os.path.join(config_file_folder, config_file_name)
+    path = os.path.join('aiport_server', config_file_folder, config_file_name)
     training_config = {}
     with open(path, 'r', encoding='utf8') as fr:
         training_config = yaml.load(fr, Loader=yaml.FullLoader)
-        logger.info("config.yaml loaded")
+        logger.info(f"{path} loaded")
 
     return training_config
 
@@ -50,11 +50,12 @@ if __name__ == "__main__":
     config["device"] = target_device
     
     # Training Code
-    trainee_class: Type[TraineeBase] = getattr(nn.trainer, config["trainee_type"])
+    trainee_module = importlib.import_module(f"aiport_server.{option_args.target}.trainer")
+    trainee_class: Type[TraineeBase] = getattr(trainee_module, config["trainee_type"])
+    
     del config["trainee_type"]
 
     trainee = trainee_class(**config)
     trainee.train()
     
     logger.info("Process Finished!")
-            

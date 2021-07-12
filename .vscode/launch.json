@@ -12,13 +12,23 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Run Mask-detector Trainer",
+            "name": "Run Mask-Detector Trainer",
             "type": "python",
             "request": "launch",
             "program": "train.py",
             "console": "integratedTerminal",
             "args": [
                 "--target", "mask_detector"
+            ]
+        },
+        {
+            "name": "Run Trip-Advisor Trainer",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--target", "trip_advisor"
             ]
         },
         {
