@@ -7,6 +7,7 @@ data_paths:
   test_root_dir: .\assets\data\trip\wos-v1\
   training_data_file: wos-v1_train.json
   test_data_file: wos-v1_dev.json
+  ontology_data_file: ontology.json
 
 save_paths:
   root_dir: ../assets/results/
@@ -17,6 +18,14 @@ save_paths:
 hyperparameters:
   seed: 327459
   epochs: 40
+  skf:
+    args:
+      split_k: 5
+      seed: 327459
+      target_fold: 2
+  tokenizer_pretrained_model_name_or_path: "dsksd/bert-ko-small-minimal"
+  preprocessing:
+    args: null
   dataloader:
     args: null
   model:
