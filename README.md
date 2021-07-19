@@ -37,7 +37,7 @@ $ python train.py --target mask_detector --config_file config.yaml
 
 #### 추론 요청
 
-Flask 서버 실행 후 서버에 'mask/' 라우터로 이미지 파일을 포함하여 POST 요청을 하면 EfficientNet 기반 Pytorch 모델을 통해 마스크 인식여부를 반환받을 수 있습니다.
+- Flask 서버 실행 후 서버에 'mask/' 라우터로 이미지 파일을 포함하여 POST 요청을 하면 EfficientNet 기반 Pytorch 모델을 통해 마스크 인식여부를 반환받을 수 있습니다.
 
 
 ## 서버 실행 방법

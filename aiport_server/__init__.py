@@ -9,7 +9,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     CORS(app)
 
-    app.register_blueprint(main_router)
+    app.register_blueprint(main_router, url_prefix='/main')
     app.register_blueprint(mask_router, url_prefix='/mask-detector')
     app.register_blueprint(trip_router, url_prefix='/trip-advisor')
 
