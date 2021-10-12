@@ -26,10 +26,9 @@ class DSTTrainee(TraineeBase):
 
             epochs = 10
 
-            for epoch in epochs:
+            for epoch in range(epochs):
                 for batch in train_loader:
-                    for elem in batch:
-                        pass
+                    break
 
         
 

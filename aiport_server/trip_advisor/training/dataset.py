@@ -31,4 +31,5 @@ class OpenVocabDSTDataset(Dataset):
 
 
 def collate_TRADE_batch(batch: List[List[Dict]]):
-    pass
+    for elem in batch:
+        print(elem)

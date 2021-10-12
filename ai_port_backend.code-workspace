@@ -5,6 +5,6 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "d:\\Workspace\\Python\\.venv\\Scripts\\python.exe"
+		"python.pythonPath": "path_to_your_python_bin"
 	}
 }
